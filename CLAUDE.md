@@ -1,6 +1,9 @@
 # CLAUDE.md
 
-This repository is a conference demo: one online shop back office, told in two acts.
+This repository, `polyglot-microfrontends`
+(https://github.com/micro-frontend-laboratory/polyglot-microfrontends), belongs to the GitHub
+organization `micro-frontend-laboratory` (https://github.com/micro-frontend-laboratory), where it
+is part 2 of 5. It is a conference demo: one online shop back office, told in two acts.
 The audience reads the code on screen, so the code must be clean and obvious.
 
 1. **Pure Web Components:** `apps/basics/web-components-basics`, the native API with no framework.
@@ -160,6 +163,7 @@ every app arrives with its `Dockerfile.dev` and its Compose service.
 | 6b | `feature/backoffice-vue` | `apps/backoffices/backoffice-vue` | Vue shell shows Angular + React + Vue on `/orders`; only the failed remote shows an error card |
 | 7 | `feature/backoffice-angular` | `apps/backoffices/backoffice-angular` | demo acts 2.1, 2.2 and 2.4 pass; two `ng-version` values on one page |
 | 8 | `feature/run-scripts` | Windows `.bat` shortcuts in `tools/scripts/` around `docker compose` `start-all`, `live-all` and one `deploy-*` per service; stopping is done from Docker Desktop |
+| 9 | `feature/rename-polyglot-microfrontends` | the name `polyglot-microfrontends` and its place in the `micro-frontend-laboratory` organization: README navigation, clone snippet, "Go deeper" | README and CLAUDE.md name the repo and its URL |
 
 ## Known pitfalls
 

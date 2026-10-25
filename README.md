@@ -1,8 +1,12 @@
 # Web Components & Micro-Frontends
 
+> **Part 2 of 5** in [Micro-Frontend Laboratory](https://github.com/micro-frontend-laboratory)
+> ← [web-components-fundamentals](https://github.com/micro-frontend-laboratory/web-components-fundamentals) · module-federation-react (coming soon) →
+
 **One online shop back office. Two acts. One contract: the custom element.**
 
-> This is the companion repository of the talk *Web Components & Micro-Frontends*.
+> [`polyglot-microfrontends`](https://github.com/micro-frontend-laboratory/polyglot-microfrontends)
+> is the companion repository of the talk *Web Components & Micro-Frontends*.
 > Every demo from the talk runs from here, and [docs/showcase.md](docs/showcase.md) is the
 > script it follows.
 
@@ -183,6 +187,11 @@ folder, and the other apps install it from there (`npm install <folder>`), with 
 You only need [Docker Desktop](https://www.docker.com/products/docker-desktop/). No Node.js,
 no Angular CLI, no version manager: every app builds and runs in its own container.
 
+```bash
+git clone https://github.com/micro-frontend-laboratory/polyglot-microfrontends.git
+cd polyglot-microfrontends
+```
+
 Start the groups in this order; `shop-services` creates the network the others join:
 
 ```bash
@@ -235,3 +244,13 @@ Stop and start single containers, or all of them, from Docker Desktop.
 | Loading | Native Federation (Angular), Module Federation (React, Vue), from each remote's own server. Every shell loads both with the same two runtimes: `@softarc/native-federation-orchestrator` and `@module-federation/runtime` |
 | Safety | `textContent` everywhere, one error card per remote |
 | Code style | Strict TypeScript, ESLint and oxlint, VS Code's built-in formatters |
+
+## Go deeper
+
+Here every remote brings its own copy of its framework, on purpose. The next question is how
+remotes share a library instead, and the next two parts of the laboratory will answer it:
+
+| Repository | What it covers |
+| --- | --- |
+| module-federation-react (coming soon) | React remotes sharing React: share scopes and version conflicts |
+| native-federation-angular (coming soon) | An Angular host and Angular remotes sharing Angular |
