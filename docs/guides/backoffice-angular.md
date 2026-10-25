@@ -1,4 +1,4 @@
-# Act 2: the Angular back office, an older host for new components
+# The Angular back office, an older host for new components
 
 `apps/backoffices/backoffice-angular` is the third shell, and it is older on purpose: Angular 20,
 written the classic way with NgModules, Zone.js, `*ngIf`, `@Input()` and constructor injection,
@@ -152,9 +152,9 @@ The shell needs the other groups running: start everything once with `tools\scri
 
 ## What to try
 
-- Demo act 2.1: the shell's filter drives the Angular list; a React tile drives the filter; a row
+- Demo step 1: the shell's filter drives the Angular list; a React tile drives the filter; a row
   click changes the URL and the detail and the notes follow; a Vue note reaches the React feed;
   "Mark as shipped" changes the React counts.
-- Demo act 2.2: two different `ng-version` values on one page.
-- Demo act 2.4: `docker compose -f compose.microfrontends.yaml stop orders` leaves only the Orders card failing; Retry recovers it.
+- Demo step 2: two different `ng-version` values on one page.
+- Demo step 4: `docker compose -f compose.microfrontends.yaml stop orders` leaves only the Orders card failing; Retry recovers it.
 - Everything is red, inside every shadow root too; in Settings, Orange recolours every component.

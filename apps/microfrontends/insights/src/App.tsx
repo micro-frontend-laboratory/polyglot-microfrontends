@@ -5,7 +5,7 @@ export function App() {
     <>
       <header className="page-header">
         <h1>Insights</h1>
-        <p>Act 2 · React. The same two components, used two ways.</p>
+        <p>React. The same two components, used two ways.</p>
         <nav className="page-nav">
           <NavLink to="/components">React components</NavLink>
           <NavLink to="/web-components">Web components</NavLink>

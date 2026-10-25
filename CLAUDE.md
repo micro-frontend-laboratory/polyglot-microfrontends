@@ -3,18 +3,17 @@
 This repository, `polyglot-microfrontends`
 (https://github.com/micro-frontend-laboratory/polyglot-microfrontends), belongs to the GitHub
 organization `micro-frontend-laboratory` (https://github.com/micro-frontend-laboratory), where it
-is part 2 of 5. It is a conference demo: one online shop back office, told in two acts.
-The audience reads the code on screen, so the code must be clean and obvious.
+is part 2 of 5. It is a conference demo: one online shop back office, built from micro-frontends
+calling each other. The audience reads the code on screen, so the code must be clean and obvious.
 
-1. **Pure Web Components:** `apps/basics/web-components-basics`, the native API with no framework.
-2. **Micro-frontends calling each other:** the latest Angular (`apps/microfrontends/orders`),
-   React (`apps/microfrontends/insights`) and Vue (`apps/microfrontends/notes`) export custom
-   elements, each from its own live server; the React, Vue and Angular shells load them at
-   runtime through federation and use them all on one page. The Angular shell, on an older
-   Angular, hosts web components built with the latest Angular.
+The latest Angular (`apps/microfrontends/orders`), React (`apps/microfrontends/insights`) and Vue
+(`apps/microfrontends/notes`) export custom elements, each from its own live server; the React,
+Vue and Angular shells load them at runtime through federation and use them all on one page. The
+Angular shell, on an older Angular, hosts web components built with the latest Angular.
 
 There is no package or "installed instead of loaded" variant: remotes are always live services.
-Every README, guide and demo step should make clear which act it belongs to.
+Native Web Components without a framework live in part 1,
+https://github.com/micro-frontend-laboratory/web-components-fundamentals, not here.
 
 README and `docs/` are for someone who downloads the repo: what each app is, how to run it, how
 it works. Build warnings, workarounds and package debates go in the pitfalls below, not there.
@@ -52,8 +51,7 @@ it works. Build warnings, workarounds and package debates go in the pitfalls bel
    contracts. Only micro-frontends call the API, each with its own endpoint; `defineElements()`
    takes no configuration, and shells pass none. Each micro-frontend writes its own HTTP client for the operations it calls and declares them
    (`implements Pick<IOrdersApi, '…'>`); each remote's elements are checked against their contract.
-7. **Strict TypeScript** (`"strict": true`) in every TypeScript project. Plain JavaScript only
-   where the point is "no build": `apps/basics/`.
+7. **Strict TypeScript** (`"strict": true`) in every project.
 8. **Each framework's default linter** behind `npm run lint`: ESLint with angular-eslint for
    Angular and the plain projects, oxlint (what `npm create vite` generates) for React and Vue.
    **No Prettier.** Formatting is VS Code's built-in formatters, set in the committed
@@ -86,12 +84,11 @@ it works. Build warnings, workarounds and package debates go in the pitfalls bel
 ## Layout and ports
 
 Apps that export custom elements live in `apps/microfrontends/`; the shells that host them live
-in `apps/backoffices/`; the back-end services they call live in `apps/services/`; the act 1 page
-lives in `apps/basics/`. A reader should see from the path which side an app is on, and each
-folder matches a Compose group. `tools/` holds only what runs around the apps: the edge proxies
+in `apps/backoffices/`; the back-end services they call live in `apps/services/`. A reader
+should see from the path which side an app is on, and each folder matches a Compose group. `tools/` holds only what runs around the apps: the edge proxies
 and the scripts.
 
-The apps form five Docker Compose projects, one per group, each with its own file in the repo
+The apps form four Docker Compose projects, one per group, each with its own file in the repo
 root. Docker Desktop shows each group on its own; `depends_on` never crosses groups.
 
 | Group | File | Services | Networks | Published |
@@ -100,23 +97,21 @@ root. Docker Desktop shows each group on its own; `depends_on` never crosses gro
 | `shop-microfrontends` | `compose.microfrontends.yaml` | `orders`, `insights`, `notes` | `shop-network` (`external: true`) | nothing |
 | `shop-backoffices` | `compose.backoffices.yaml` | `backoffice-react`, `backoffice-vue`, `backoffice-angular` | `shop-network` (`external: true`) | nothing |
 | `shop-edge` | `compose.edge.yaml` | `backoffice-react-proxy`, `backoffice-vue-proxy`, `backoffice-angular-proxy` | `shop-network` and `shop-public` | 4200, 4400, 4500 |
-| `shop-basics` | `compose.basics.yaml` | `web-components-basics` | its own default network | 4100 |
 
 `shop-services` starts first because it creates `shop-network`; a group that joins it before it
 exists fails with "network shop-network not found". `shop-network` is internal: no access from
 the host, no internet at runtime. The edge proxies are the only containers on both networks.
 
-| Act | Folder | What | Internal address | Public address |
-| --- | --- | --- | --- | --- |
-| 1 | `apps/basics/web-components-basics` | Three native Web Components | | `localhost:4100` |
-| 2 | `apps/microfrontends/orders` | Latest Angular, exports `shop-orders-list`, `shop-order-detail` | `orders:4201/mf/orders/` | none |
-| 2 | `apps/microfrontends/insights` | React 18, exports `shop-order-stats`, `shop-activity-feed` | `insights:4202/mf/insights/` | none |
-| 2 | `apps/microfrontends/notes` | Vue 3.5, exports `shop-order-notes` | `notes:4402/mf/notes/` | none |
-| 2 | `apps/backoffices/backoffice-react` | React 19 shell | `backoffice-react:4200/` | `localhost:4200` through its proxy |
-| 2 | `apps/backoffices/backoffice-vue` | Vue 3.5.42 shell | `backoffice-vue:4400/` | `localhost:4400` through its proxy |
-| 2 | `apps/backoffices/backoffice-angular` | Angular 20 shell (NgModules, Zone.js) | `backoffice-angular:4500/` | `localhost:4500` through its proxy |
-| all | `apps/services/mock-api` | Orders REST API (Express, TypeScript run directly by Node) | `mock-api:3000` | none |
-| all | `tools/edge` | One nginx proxy per shell: `<shell>.conf` and one `Dockerfile.dev` with `ARG SITE` | | 4200, 4400, 4500 |
+| Folder | What | Internal address | Public address |
+| --- | --- | --- | --- |
+| `apps/microfrontends/orders` | Latest Angular, exports `shop-orders-list`, `shop-order-detail` | `orders:4201/mf/orders/` | none |
+| `apps/microfrontends/insights` | React 18, exports `shop-order-stats`, `shop-activity-feed` | `insights:4202/mf/insights/` | none |
+| `apps/microfrontends/notes` | Vue 3.5, exports `shop-order-notes` | `notes:4402/mf/notes/` | none |
+| `apps/backoffices/backoffice-react` | React 19 shell | `backoffice-react:4200/` | `localhost:4200` through its proxy |
+| `apps/backoffices/backoffice-vue` | Vue 3.5.42 shell | `backoffice-vue:4400/` | `localhost:4400` through its proxy |
+| `apps/backoffices/backoffice-angular` | Angular 20 shell (NgModules, Zone.js) | `backoffice-angular:4500/` | `localhost:4500` through its proxy |
+| `apps/services/mock-api` | Orders REST API (Express, TypeScript run directly by Node) | `mock-api:3000` | none |
+| `tools/edge` | One nginx proxy per shell: `<shell>.conf` and one `Dockerfile.dev` with `ARG SITE` | | 4200, 4400, 4500 |
 
 Each proxy serves its shell at `/` and forwards `/mf/orders/`, `/mf/insights/`, `/mf/notes/` and
 `/api/` (prefix stripped) by Docker DNS name. The remotes serve under the same `/mf/<name>/`
@@ -134,7 +129,6 @@ docker compose -f compose.services.yaml up --build --detach --wait          # fi
 docker compose -f compose.microfrontends.yaml up --build --detach --wait
 docker compose -f compose.backoffices.yaml up --build --detach --wait
 docker compose -f compose.edge.yaml up --build --detach --wait
-docker compose -f compose.basics.yaml up --build --detach --wait
 docker compose -f compose.microfrontends.yaml watch                         # live edits, one group per terminal
 docker compose -f compose.services.yaml up -d --force-recreate mock-api     # back to the seed data
 ```
@@ -142,9 +136,7 @@ docker compose -f compose.services.yaml up -d --force-recreate mock-api     # ba
 `tools/scripts/start-all.bat` and `live-all.bat` run the groups in this order; the `deploy-*.bat`
 scripts sit in one folder per group.
 
-Plain JavaScript projects (`apps/basics/`) are served by `nginx:stable-alpine` with no
-npm at runtime; Node projects start with `npm start` (or `npm run start:docker`) inside their
-image. Dev servers must listen on `0.0.0.0` in Docker only.
+Node projects start with `npm start` (or `npm run start:docker`) inside their image. Dev servers must listen on `0.0.0.0` in Docker only.
 Use Compose Watch (`develop.watch`), not bind mounts, so edits on Windows reach the container.
 
 ## Stages
@@ -155,15 +147,16 @@ every app arrives with its `Dockerfile.dev` and its Compose service.
 | # | Branch | Adds | Done when |
 | --- | --- | --- | --- |
 | 1 | `feature/foundation` | README, CLAUDE.md, architecture and demo docs, VS Code settings, `tools/mock-api`, `compose.yaml` | container is healthy; `/orders` returns 5, `?status=open` returns 3, PATCH works, recreating the container restores the seed |
-| 2 | `feature/web-components-basics` | act 1: `examples/web-components-basics` | the page works; typed HTML shows as text |
+| 2 | `feature/web-components-basics` | act 1: `examples/web-components-basics`, since moved to web-components-fundamentals | the page works; typed HTML shows as text |
 | 3 | `feature/orders` | `apps/microfrontends/orders` (latest Angular) | dev page lists orders, row click fills the detail, "Mark as shipped" updates the list; `remoteEntry.json` exposes `./elements`; no `zone.js` |
 | 4 | `feature/insights` | `apps/microfrontends/insights` | `/components` and `/web-components` work; `remoteEntry.js` exposes `./elements` and works from another origin |
 | 5 | `feature/backoffice-react` | `apps/backoffices/backoffice-react` | dashboard, `/orders` master-detail, deep link, theme switch, error card |
 | 6 | `feature/notes-and-backoffice-vue` | `apps/microfrontends/notes`, the notes API, the `microfrontends` / `backoffices` folders | Notes' `remoteEntry.js` exposes `./elements` and works from another origin |
 | 6b | `feature/backoffice-vue` | `apps/backoffices/backoffice-vue` | Vue shell shows Angular + React + Vue on `/orders`; only the failed remote shows an error card |
-| 7 | `feature/backoffice-angular` | `apps/backoffices/backoffice-angular` | demo acts 2.1, 2.2 and 2.4 pass; two `ng-version` values on one page |
+| 7 | `feature/backoffice-angular` | `apps/backoffices/backoffice-angular` | demo steps 1, 2 and 4 pass; two `ng-version` values on one page |
 | 8 | `feature/run-scripts` | Windows `.bat` shortcuts in `tools/scripts/` around `docker compose` `start-all`, `live-all` and one `deploy-*` per service; stopping is done from Docker Desktop |
 | 9 | `feature/rename-polyglot-microfrontends` | the name `polyglot-microfrontends` and its place in the `micro-frontend-laboratory` organization: README navigation, clone snippet, "Go deeper" | README and CLAUDE.md name the repo and its URL |
+| 10 | `feature/move-basics-to-fundamentals` | act 1 moved to web-components-fundamentals; the act framing removed from docs and app headers | no `apps/basics`, `shop-basics` or port 4100 left; `start-all.bat` starts four groups |
 
 ## Known pitfalls
 

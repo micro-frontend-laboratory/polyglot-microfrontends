@@ -2,7 +2,7 @@
   "name": "@shop/insights",
   "version": "1.0.0",
   "private": true,
-  "description": "Act 2: order statistics and activity feed, written in React and exported as custom elements",
+  "description": "Order statistics and activity feed, written in React and exported as custom elements",
   "type": "module",
   "scripts": {
     "dev": "vite",

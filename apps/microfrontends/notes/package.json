@@ -2,7 +2,7 @@
   "name": "@shop/notes",
   "version": "1.0.0",
   "private": true,
-  "description": "Act 2: status filter and order notes, written in Vue and exported as custom elements",
+  "description": "Status filter and order notes, written in Vue and exported as custom elements",
   "type": "module",
   "scripts": {
     "dev": "vite",

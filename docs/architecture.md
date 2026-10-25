@@ -1,46 +1,39 @@
 # Architecture
 
-One online shop back office, told in two acts:
-
-1. **Pure Web Components.** How to write a component with nothing but the browser.
-2. **Micro-frontends calling each other.** Angular, React and Vue ship their features as custom
-   elements, each from its own server, and React, Vue and Angular hosts load them at runtime
-   and use them all on one page. No app imports another app's code; they meet only through tags:
-   attributes and properties go down, `CustomEvent`s come up.
+One online shop back office. Angular, React and Vue ship their features as custom elements, each
+from its own server, and React, Vue and Angular hosts load them at runtime and use them all on
+one page. No app imports another app's code; they meet only through tags: attributes and
+properties go down, `CustomEvent`s come up.
 
 ## The cast
 
-| Act | Folder | Role | Framework | Group | Reached at | Ships |
-| --- | --- | --- | --- | --- | --- | --- |
-| 1 | `apps/basics/web-components-basics` | Three native components | none | `shop-basics` | `localhost:4100` | static files |
-| 2 | `apps/microfrontends/orders` | Remote: order list and order detail | current Angular, zoneless | `shop-microfrontends` | internal: `orders:4201/mf/orders/` | `remoteEntry.json` (Native Federation) |
-| 2 | `apps/microfrontends/insights` | Remote: order statistics and activity feed | React 18 | `shop-microfrontends` | internal: `insights:4202/mf/insights/` | `remoteEntry.js` (Module Federation) |
-| 2 | `apps/microfrontends/notes` | Remote: order notes | Vue 3.5 | `shop-microfrontends` | internal: `notes:4402/mf/notes/` | `remoteEntry.js` (Module Federation) |
-| 2 | `apps/backoffices/backoffice-react` | Host | React 19 + React Router | `shop-backoffices` | `localhost:4200`, through its proxy | the site |
-| 2 | `apps/backoffices/backoffice-vue` | Host, on an older Vue | Vue 3.5.42 + Vue Router | `shop-backoffices` | `localhost:4400`, through its proxy | the site |
-| 2 | `apps/backoffices/backoffice-angular` | Host, on an older Angular on purpose | Angular 20, NgModules, Zone.js | `shop-backoffices` | `localhost:4500`, through its proxy | the site |
-| all | `apps/services/mock-api` | Orders REST API | Express, TypeScript | `shop-services` | internal: `mock-api:3000` | `GET/PATCH /orders`, `GET/POST /orders/:id/notes` |
-| all | `tools/edge` | One nginx proxy per back office | nginx | `shop-edge` | `localhost:4200`, `4400`, `4500` | the way in |
+| Folder | Role | Framework | Group | Reached at | Ships |
+| --- | --- | --- | --- | --- | --- |
+| `apps/microfrontends/orders` | Remote: order list and order detail | current Angular, zoneless | `shop-microfrontends` | internal: `orders:4201/mf/orders/` | `remoteEntry.json` (Native Federation) |
+| `apps/microfrontends/insights` | Remote: order statistics and activity feed | React 18 | `shop-microfrontends` | internal: `insights:4202/mf/insights/` | `remoteEntry.js` (Module Federation) |
+| `apps/microfrontends/notes` | Remote: order notes | Vue 3.5 | `shop-microfrontends` | internal: `notes:4402/mf/notes/` | `remoteEntry.js` (Module Federation) |
+| `apps/backoffices/backoffice-react` | Host | React 19 + React Router | `shop-backoffices` | `localhost:4200`, through its proxy | the site |
+| `apps/backoffices/backoffice-vue` | Host, on an older Vue | Vue 3.5.42 + Vue Router | `shop-backoffices` | `localhost:4400`, through its proxy | the site |
+| `apps/backoffices/backoffice-angular` | Host, on an older Angular on purpose | Angular 20, NgModules, Zone.js | `shop-backoffices` | `localhost:4500`, through its proxy | the site |
+| `apps/services/mock-api` | Orders REST API | Express, TypeScript | `shop-services` | internal: `mock-api:3000` | `GET/PATCH /orders`, `GET/POST /orders/:id/notes` |
+| `tools/edge` | One nginx proxy per back office | nginx | `shop-edge` | `localhost:4200`, `4400`, `4500` | the way in |
 
 ```text
-Act 1   localhost:4100 ──► web-components-basics          user-card · counter-button · todo-list
-                           shop-basics, on its own
+localhost:4200 ─┐   shop-edge            ┌─► backoffice-react       React 19     ┐
+localhost:4400 ─┼─► one proxy per site ──┼─► backoffice-vue         Vue 3.5.42   ├ shop-backoffices
+localhost:4500 ─┘   (published)          ├─► backoffice-angular   Angular 20   ┘
+                                         │
+                      /mf/orders/   ─────┼─► orders:4201     shop-orders-list · shop-order-detail     ┐
+                      /mf/insights/ ─────┼─► insights:4202   shop-order-stats · shop-activity-feed    ├ shop-microfrontends
+                      /mf/notes/    ─────┼─► notes:4402      shop-order-notes                         ┘
+                      /api/         ─────┴─► mock-api:3000   GET/PATCH /orders · notes                  shop-services
 
-Act 2   localhost:4200 ─┐   shop-edge            ┌─► backoffice-react       React 19     ┐
-        localhost:4400 ─┼─► one proxy per site ──┼─► backoffice-vue         Vue 3.5.42   ├ shop-backoffices
-        localhost:4500 ─┘   (published)          ├─► backoffice-angular   Angular 20   ┘
-                                                 │
-                              /mf/orders/   ─────┼─► orders:4201     shop-orders-list · shop-order-detail     ┐
-                              /mf/insights/ ─────┼─► insights:4202   shop-order-stats · shop-activity-feed    ├ shop-microfrontends
-                              /mf/notes/    ─────┼─► notes:4402      shop-order-notes                         ┘
-                              /api/         ─────┴─► mock-api:3000   GET/PATCH /orders · notes                  shop-services
-
-                              everything right of the proxies: shop-network, internal
+                      everything right of the proxies: shop-network, internal
 ```
 
 ## Groups and networks
 
-The apps form five groups, one Docker Compose project each, the way separate teams would own
+The apps form four groups, one Docker Compose project each, the way separate teams would own
 them. Docker Desktop shows each group on its own, and each one starts, stops and deploys on its
 own.
 
@@ -50,7 +43,6 @@ own.
 | `shop-microfrontends` | `compose.microfrontends.yaml` | `orders`, `insights`, `notes` | `shop-network` | nothing |
 | `shop-backoffices` | `compose.backoffices.yaml` | the three shells | `shop-network` | nothing |
 | `shop-edge` | `compose.edge.yaml` | one proxy per shell | `shop-network` and `shop-public` | 4200, 4400, 4500 |
-| `shop-basics` | `compose.basics.yaml` | the act 1 page | its own | 4100 |
 
 `shop-network` is an `internal` Docker network: nothing outside Docker can reach it, and the
 containers on it cannot reach the internet. `shop-services` creates it, so it starts first; the

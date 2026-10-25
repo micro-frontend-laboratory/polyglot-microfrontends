@@ -1,4 +1,4 @@
-# Act 2: Notes, from a Vue app to a web component
+# Notes, from a Vue app to a web component
 
 `apps/microfrontends/notes` is a regular Vue application, created with `npm create vite@latest` (Vue +
 TypeScript template). It owns one thing, the notes of an order. Its component is then turned into

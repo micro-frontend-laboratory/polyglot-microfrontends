@@ -1,4 +1,4 @@
-# Act 2: Insights, from a React app to web components
+# Insights, from a React app to web components
 
 `apps/microfrontends/insights` is a regular React application, created with `npm create vite@latest` (React +
 TypeScript template). The same two components are then turned into custom elements without

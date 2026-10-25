@@ -2,7 +2,7 @@
   "name": "@shop/orders",
   "version": "1.0.0",
   "private": true,
-  "description": "Act 2: the orders list and order detail, written in the latest Angular and exported as custom elements",
+  "description": "The orders list and order detail, written in the latest Angular and exported as custom elements",
   "packageManager": "npm@11.19.1",
   "scripts": {
     "ng": "ng",

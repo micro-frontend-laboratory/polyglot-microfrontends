@@ -13,7 +13,7 @@ export function App() {
     <>
       <header className="page-header">
         <h1>Shop Back Office</h1>
-        <p>Act 2 · the React {version} host. Angular, React and Vue components, loaded at runtime.</p>
+        <p>The React {version} host. Angular, React and Vue components, loaded at runtime.</p>
         <nav className="page-nav">
           <NavLink to="/dashboard">Dashboard</NavLink>
           <NavLink to="/orders">Orders</NavLink>
