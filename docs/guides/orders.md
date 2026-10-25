@@ -1,4 +1,4 @@
-# Act 2: Orders, from an Angular app to web components
+# Orders, from an Angular app to web components
 
 `apps/microfrontends/orders` is a regular Angular application, written the way the Angular team recommends.
 The same two components are then turned into custom elements without changing a line inside

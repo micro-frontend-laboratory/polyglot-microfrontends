@@ -2,7 +2,7 @@
   "name": "@shop/backoffice-angular",
   "version": "1.0.0",
   "private": true,
-  "description": "Act 2: the older Angular back office that hosts web components built with the latest Angular, React and Vue",
+  "description": "The older Angular back office that hosts web components built with the latest Angular, React and Vue",
   "scripts": {
     "ng": "ng",
     "start": "ng serve",

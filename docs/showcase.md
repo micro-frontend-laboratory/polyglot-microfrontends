@@ -1,26 +1,12 @@
 # Demo script
 
-Two acts: write a Web Component by hand, then let three micro-frontends, each with its own
-framework and its own server, run together in three different shells.
+Three micro-frontends, each with its own framework and its own server, run together in three
+different shells.
 
 Start everything first with `tools\scripts\start-all.bat`, and restore the seed data afterwards
 with `tools\scripts\services\deploy-mock-api.bat`.
 
-## Act 1: Pure Web Components
-
-**Open** `http://localhost:4100` (`apps/basics/web-components-basics`).
-
-- Type a new name: `<user-card>` updates through an attribute and `attributeChangedCallback`.
-- Click the counter: the page hears the `count-changed` event.
-- Click "Add Milk from the page": the page calls the component's public method.
-- Type `<img src=x onerror=alert(1)>` as the name: it shows as text. `textContent` cannot run code.
-
-**Message:** Web Components are a browser standard. No framework, no build. Attributes go in,
-events come out, and that is the whole contract.
-
-## Act 2: Micro-frontends calling each other
-
-### 2.1 Any framework hosts any other
+## 1. Any framework hosts any other
 
 **Open** `http://localhost:4500/orders` (`backoffice-angular`).
 
@@ -30,10 +16,10 @@ events come out, and that is the whole contract.
 - Add a note in **Vue**: it appears in the **React** feed.
 - Mark the order as shipped in **Angular**: the **React** counts update.
 
-**Message:** the same contract as act 1. Angular, React and Vue each ship a custom element; the
-host listens to events and sets attributes. None of them imports another framework.
+**Message:** the plain custom element contract. Angular, React and Vue each ship a custom
+element; the host listens to events and sets attributes. None of them imports another framework.
 
-### 2.2 Versions don't matter
+## 2. Versions don't matter
 
 Every shell's header names its own framework version, and every element stamps the version it
 runs on. In the browser console, on any of the three `/orders` pages:
@@ -56,7 +42,7 @@ React 19 shell, Notes brings Vue 3.5.44 into the Vue 3.5.42 shell.
 **Message:** versions don't have to match, in either direction. Teams upgrade on their own
 schedule.
 
-### 2.3 Same components, different host
+## 3. Same components, different host
 
 **Open** `http://localhost:4400/orders` (`backoffice-vue`) and `http://localhost:4200/orders`
 (`backoffice-react`).
@@ -67,7 +53,7 @@ schedule.
 
 **Message:** the host decides the theme and the layout; the components don't care who hosts them.
 
-### 2.4 Independent and resilient
+## 4. Independent and resilient
 
 In Docker Desktop, stop the `orders` container and reload `http://localhost:4500/orders`.
 
@@ -76,7 +62,7 @@ In Docker Desktop, stop the `orders` container and reload `http://localhost:4500
 
 **Message:** one team's outage never takes down the page.
 
-### 2.5 One release, every shell
+## 5. One release, every shell
 
 Open `apps/microfrontends/orders/src/app/orders/components/orders-list/orders-list.html` and
 change the heading `Orders` to `Orders to ship`. Save, then deploy only the Orders team's
@@ -92,7 +78,10 @@ service with `tools\scripts\microfrontends\deploy-mf-orders.bat`. Reload `http:/
 
 ## Closing slide
 
-| Act | Takeaway |
+| Step | Takeaway |
 | --- | --- |
-| 1. Pure Web Components | A component is a class, a tag, attributes in and events out |
-| 2. Micro-frontends calling each other | Every framework can export and host custom elements; each remote is a live service, and the host owns URL, layout and theme |
+| 1. Any framework hosts any other | Every framework can export and host custom elements |
+| 2. Versions don't matter | Each remote brings its own framework version |
+| 3. Same components, different host | The host owns URL, layout and theme |
+| 4. Independent and resilient | One remote's outage stays on its own card |
+| 5. One release, every shell | Each remote is a live service, deployed on its own |

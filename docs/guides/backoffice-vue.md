@@ -1,4 +1,4 @@
-# Act 2: the Vue back office, hosting all three frameworks
+# The Vue back office, hosting all three frameworks
 
 `apps/backoffices/backoffice-vue` is the second shell: a Vue app (`npm create vite@latest`,
 Vue + TypeScript template) that puts the Angular components from Orders, the React components

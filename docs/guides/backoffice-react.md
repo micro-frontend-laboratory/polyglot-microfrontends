@@ -1,4 +1,4 @@
-# Act 2: the React back office, hosting all three frameworks
+# The React back office, hosting all three frameworks
 
 `apps/backoffices/backoffice-react` is a React shell (`npm create vite@latest`, React + TypeScript
 template) that puts the Angular components from Orders, the React components from Insights and

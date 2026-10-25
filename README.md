@@ -3,31 +3,14 @@
 > **Part 2 of 5** in [Micro-Frontend Laboratory](https://github.com/micro-frontend-laboratory)
 > ← [web-components-fundamentals](https://github.com/micro-frontend-laboratory/web-components-fundamentals) · module-federation-react (coming soon) →
 
-**One online shop back office. Two acts. One contract: the custom element.**
+**One online shop back office. Three frameworks. One contract: the custom element.**
 
 > [`polyglot-microfrontends`](https://github.com/micro-frontend-laboratory/polyglot-microfrontends)
 > is the companion repository of the talk *Web Components & Micro-Frontends*.
-> Every demo from the talk runs from here, and [docs/showcase.md](docs/showcase.md) is the
-> script it follows.
+> Every micro-frontend demo from the talk runs from here, and [docs/showcase.md](docs/showcase.md)
+> is the script it follows.
 
-## The two acts
-
-### Act 1: Pure Web Components
-
-[`apps/basics/web-components-basics`](apps/basics/web-components-basics): three components written
-with nothing but the browser. A class, a tag, attributes in, events out.
-
-```js
-class UserCard extends HTMLElement {
-  static observedAttributes = ['name'];
-  attributeChangedCallback() {
-    this.#name.textContent = this.getAttribute('name');
-  }
-}
-customElements.define('user-card', UserCard);
-```
-
-### Act 2: Micro-frontends calling each other
+## Micro-frontends calling each other
 
 Three teams ship their features as custom elements, each with its own framework, and each runs
 its own server:
@@ -45,7 +28,9 @@ of them on one page: [`backoffice-react`](apps/backoffices/backoffice-react),
 framework, at its own version, and so does every micro-frontend: the React 19 shell hosts React 18
 components, the Vue 3.5.42 shell hosts Vue 3.5.44 components, and the Angular 20 shell hosts the
 latest Angular. No app imports another app's code, and a new release of a remote reaches every shell at the next page
-load. They use the same contract as act 1:
+load. They meet only through the custom element contract, the one
+[web-components-fundamentals](https://github.com/micro-frontend-laboratory/web-components-fundamentals)
+builds by hand:
 
 ```html
 <shop-orders-list status="open"></shop-orders-list>
@@ -60,7 +45,7 @@ list.addEventListener('orderSelected', (event) => {
 
 ## How it fits together
 
-Every app is its own server, and the servers form five groups, one Docker Compose project each,
+Every app is its own server, and the servers form four groups, one Docker Compose project each,
 the way separate teams would own them. Only the edge is published: one proxy per back office, on
 its own port. Everything else lives on `shop-network`, an internal Docker network the browser
 never reaches. Each proxy serves its shell at `/` and fetches the remotes and the API by their
@@ -69,10 +54,6 @@ Docker DNS names, so everything a page loads comes from that site and from our o
 ```mermaid
 flowchart LR
   browser([Browser])
-
-  subgraph basics[shop-basics · published]
-    wcb[web-components-basics · act 1<br/>localhost:4100]
-  end
 
   subgraph edge[shop-edge · published · the only way in]
     direction TB
@@ -98,7 +79,6 @@ flowchart LR
     end
   end
 
-  browser --> wcb
   browser --> edge
   rp -- "/" --> react
   vp -- "/" --> vue
@@ -113,7 +93,6 @@ flowchart LR
 | `shop-microfrontends` | `compose.microfrontends.yaml` | `orders`, `insights`, `notes` | nothing |
 | `shop-backoffices` | `compose.backoffices.yaml` | the three shells | nothing |
 | `shop-edge` | `compose.edge.yaml` | one nginx proxy per shell, from `tools/edge` | 4200, 4400, 4500 |
-| `shop-basics` | `compose.basics.yaml` | the act 1 page, on its own | 4100 |
 
 The shell loads each remote's `remoteEntry` from its own site (`/mf/orders/remoteEntry.json`),
 and the elements call `/api` on the same site. The proxy forwards both inside the network.
@@ -155,22 +134,20 @@ The full contract (tags, attributes, events, theme tokens) is in
 
 ```text
 apps/
-  basics/                   the act 1 page, deployed on its own
-    web-components-basics/  act 1   plain JavaScript
   microfrontends/           the apps that export custom elements
-    orders/                 act 2   latest Angular
-      contract/                     @shop/orders-contract
-    insights/               act 2   React 18
-      contract/                     @shop/insights-contract
-    notes/                  act 2   Vue 3.5
-      contract/                     @shop/notes-contract
+    orders/                 latest Angular
+      contract/             @shop/orders-contract
+    insights/               React 18
+      contract/             @shop/insights-contract
+    notes/                  Vue 3.5
+      contract/             @shop/notes-contract
   backoffices/              the shells that host them
-    backoffice-react/       act 2   React 19
-    backoffice-vue/         act 2   Vue 3.5.42
-    backoffice-angular/     act 2   Angular 20
+    backoffice-react/       React 19
+    backoffice-vue/         Vue 3.5.42
+    backoffice-angular/     Angular 20
   services/                 the back-end services the elements call
     mock-api/               the orders REST API
-      contract/                     @shop/api-contract
+      contract/             @shop/api-contract
 tools/
   edge/                     one nginx proxy per back office: serves the site, forwards /mf/ and /api/
   scripts/                  Windows shortcuts around docker compose
@@ -199,7 +176,6 @@ docker compose -f compose.services.yaml up --build --detach --wait
 docker compose -f compose.microfrontends.yaml up --build --detach --wait
 docker compose -f compose.backoffices.yaml up --build --detach --wait
 docker compose -f compose.edge.yaml up --build --detach --wait
-docker compose -f compose.basics.yaml up --build --detach --wait
 ```
 
 Docker Desktop shows each group on its own. Stopping one group stops only that team's part:
@@ -207,14 +183,13 @@ stop `shop-microfrontends` and the back offices stay up and show an error card p
 `docker compose -f compose.services.yaml up -d --force-recreate mock-api` puts the orders back to
 their starting state after a demo.
 
-| Act | Open | Project |
-| --- | --- | --- |
-| 1 | `http://localhost:4100` | `apps/basics/web-components-basics` |
-| 2 | `http://localhost:4500/orders` | `apps/backoffices/backoffice-angular` |
-| 2 | `http://localhost:4400/orders` | `apps/backoffices/backoffice-vue` |
-| 2 | `http://localhost:4200/orders` | `apps/backoffices/backoffice-react` |
+| Open | Project |
+| --- | --- |
+| `http://localhost:4500/orders` | `apps/backoffices/backoffice-angular` |
+| `http://localhost:4400/orders` | `apps/backoffices/backoffice-vue` |
+| `http://localhost:4200/orders` | `apps/backoffices/backoffice-react` |
 
-Only these four ports are published: the act 1 page and the three edge proxies. The
+Only these three ports are published, one per edge proxy. The
 micro-frontends, the shells and `mock-api` have no port on your computer; each proxy reaches them
 by name on the internal `shop-network`. `/api/` answers only the pages' own `fetch` calls;
 opening it in the address bar or with curl returns `403`.
@@ -226,12 +201,11 @@ the `docker compose` commands for you and leaves the terminal where it was.
 
 | Script | What it does |
 | --- | --- |
-| `start-all.bat` | Builds and starts the five groups in order and waits until all are healthy |
+| `start-all.bat` | Builds and starts the four groups in order and waits until all are healthy |
 | `live-all.bat` | Starts every group with Compose Watch, one window per group: saved edits reach the containers at once |
 | `microfrontends/deploy-mf-orders.bat`, `deploy-mf-insights.bat`, `deploy-mf-notes.bat` | Rebuilds and restarts one micro-frontend from the current source; everything else keeps running |
 | `backoffices/deploy-backoffice-react.bat`, `deploy-backoffice-vue.bat`, `deploy-backoffice-angular.bat` | The same for one back office |
 | `services/deploy-mock-api.bat` | The same for the API; the orders and notes go back to the seed data |
-| `basics/deploy-web-components-basics.bat` | The same for the act 1 page |
 
 Stop and start single containers, or all of them, from Docker Desktop.
 
